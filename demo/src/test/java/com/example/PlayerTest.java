@@ -98,6 +98,19 @@ class PlayerTest {
         assertThrows(IllegalStateException.class, () -> cpu.makeMove(board));
     }
 
+    /** Verifies successive human and CPU instances receive distinct defaults. */
+    @Test
+    @Order(6)
+    void multiplePlayersReceiveSequentialDefaultNames() {
+        HumanPlayer firstHuman = new HumanPlayer('X', new Scanner(""));
+        HumanPlayer secondHuman = new HumanPlayer('O', new Scanner(""));
+        CpuPlayer firstCpu = new CpuPlayer('X', new Random(1));
+        CpuPlayer secondCpu = new CpuPlayer('O', new Random(2));
+
+        assertSequentialNames("Player #", firstHuman.getName(), secondHuman.getName());
+        assertSequentialNames("CPU #", firstCpu.getName(), secondCpu.getName());
+    }
+
     /** Counts the occurrences of a marker on the supplied board. */
     private int countMarker(Board board, char marker) {
         int count = 0;
@@ -109,5 +122,12 @@ class PlayerTest {
             }
         }
         return count;
+    }
+
+    /** Verifies the second default name increments the first one's sequence. */
+    private void assertSequentialNames(String prefix, String first, String second) {
+        assertTrue(first.startsWith(prefix));
+        int firstNumber = Integer.parseInt(first.substring(prefix.length()));
+        assertEquals(prefix + (firstNumber + 1), second);
     }
 }
