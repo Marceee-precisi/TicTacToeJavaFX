@@ -7,12 +7,47 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.Scanner;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /** Unit tests for human and CPU player move behavior. */
+@TestMethodOrder(OrderAnnotation.class)
 class PlayerTest {
+    /** Verifies default names and that custom names can be read after setting. */
+    @Test
+    @Order(1)
+    void playersHaveDefaultNamesAndCanBeRenamed() {
+        HumanPlayer human = new HumanPlayer('X', new Scanner(""));
+        CpuPlayer cpu = new CpuPlayer('O', new Random(1));
+
+        assertEquals("Player #1", human.getName());
+        assertEquals("CPU #1", cpu.getName());
+        human.setName("Alice");
+        cpu.setName("Computer");
+        assertEquals("Alice", human.getName());
+        assertEquals("Computer", cpu.getName());
+    }
+
+    /** Verifies names reject null, empty, and whitespace-only values. */
+    @Test
+    @Order(2)
+    void playerNamesCannotBeNullOrBlank() {
+        HumanPlayer human = new HumanPlayer('X', new Scanner(""));
+        CpuPlayer cpu = new CpuPlayer('O', new Random(1));
+
+        assertThrows(IllegalArgumentException.class, () -> human.setName(null));
+        assertThrows(IllegalArgumentException.class, () -> human.setName(""));
+        assertThrows(IllegalArgumentException.class, () -> human.setName(" \t "));
+        assertThrows(IllegalArgumentException.class, () -> cpu.setName(null));
+        assertThrows(IllegalArgumentException.class, () -> cpu.setName(""));
+        assertThrows(IllegalArgumentException.class, () -> cpu.setName(" \t "));
+    }
+
     /** Verifies a human can place a marker at valid coordinates. */
     @Test
+    @Order(3)
     void humanCanPlaceAMoveFromSelectedCoordinates() {
         Board board = new Board();
         HumanPlayer player = new HumanPlayer('X', new Scanner(""));
@@ -25,6 +60,7 @@ class PlayerTest {
 
     /** Verifies the human player retries malformed and occupied coordinates. */
     @Test
+    @Order(4)
     void humanRetriesMalformedAndOccupiedPositions() {
         Board board = new Board();
         board.place(0, 0, 'O');
@@ -43,6 +79,7 @@ class PlayerTest {
 
     /** Verifies the CPU chooses an empty cell and rejects a full board. */
     @Test
+    @Order(5)
     void cpuSelectsAnEmptyCellAndCannotPlayOnAFullBoard() {
         Board board = new Board();
         board.place(0, 0, 'X');
