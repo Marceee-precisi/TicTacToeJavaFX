@@ -102,6 +102,7 @@ public class Main extends Application {
             gameOver = true;
             statusLabel.setText(player.getName() + " wins!");
             updateBoardView();
+            highlightWinningLine();
             return true;
         }
         if (board.isFull()) {
@@ -120,7 +121,7 @@ public class Main extends Application {
                 Button cell = cells[row][column];
                 cell.setText(marker == ' ' ? "" : Character.toString(marker));
                 cell.setDisable(gameOver || marker != ' ');
-                cell.getStyleClass().removeAll("x-cell", "o-cell");
+                cell.getStyleClass().removeAll("x-cell", "o-cell", "winning-cell");
                 if (marker == 'X') {
                     cell.getStyleClass().add("x-cell");
                 } else if (marker == 'O') {
@@ -128,6 +129,37 @@ public class Main extends Application {
                 }
             }
         }
+    }
+
+    private void highlightWinningLine() {
+        int[][] winningLine = findWinningLine();
+        for (int[] position : winningLine) {
+            cells[position[0]][position[1]].getStyleClass().add("winning-cell");
+        }
+    }
+
+    private int[][] findWinningLine() {
+        for (int row = 0; row < 3; row++) {
+            if (sameNonEmpty(board.getCell(row, 0), board.getCell(row, 1), board.getCell(row, 2))) {
+                return new int[][]{{row, 0}, {row, 1}, {row, 2}};
+            }
+        }
+        for (int column = 0; column < 3; column++) {
+            if (sameNonEmpty(board.getCell(0, column), board.getCell(1, column), board.getCell(2, column))) {
+                return new int[][]{{0, column}, {1, column}, {2, column}};
+            }
+        }
+        if (sameNonEmpty(board.getCell(0, 0), board.getCell(1, 1), board.getCell(2, 2))) {
+            return new int[][]{{0, 0}, {1, 1}, {2, 2}};
+        }
+        if (sameNonEmpty(board.getCell(0, 2), board.getCell(1, 1), board.getCell(2, 0))) {
+            return new int[][]{{0, 2}, {1, 1}, {2, 0}};
+        }
+        throw new IllegalStateException("A winning board must contain a winning line");
+    }
+
+    private boolean sameNonEmpty(char first, char second, char third) {
+        return first != ' ' && first == second && second == third;
     }
 
     private void restartGame() {
