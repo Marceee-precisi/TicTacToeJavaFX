@@ -24,6 +24,7 @@ class BoardTest {
         assertTrue(board.isValid(0, 0));
         assertFalse(board.isValid(-1, 0));
         assertFalse(board.isValid(3, 0));
+        assertFalse(board.isValid(0, -1));
         assertFalse(board.isValid(0, 3));
         assertTrue(board.place(0, 0, 'X'));
         assertFalse(board.isValid(0, 0));
