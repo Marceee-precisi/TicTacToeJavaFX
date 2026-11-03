@@ -30,9 +30,22 @@ class PlayerTest {
         assertEquals("Computer", cpu.getName());
     }
 
-    /** Verifies names reject null, empty, and whitespace-only values. */
+    /** Verifies failed construction does not consume a default-name number. */
     @Test
     @Order(2)
+    void invalidPlayerConstructionDoesNotConsumeDefaultName() {
+        assertThrows(NullPointerException.class, () -> new HumanPlayer('X', null));
+        assertThrows(IllegalArgumentException.class, () -> new HumanPlayer('Z', new Scanner("")));
+        assertThrows(NullPointerException.class, () -> new CpuPlayer('X', null));
+        assertThrows(IllegalArgumentException.class, () -> new CpuPlayer('Z', new Random(1)));
+
+        assertEquals("Player #2", new HumanPlayer('O', new Scanner("")).getName());
+        assertEquals("CPU #2", new CpuPlayer('O', new Random(2)).getName());
+    }
+
+    /** Verifies names reject null, empty, and whitespace-only values. */
+    @Test
+    @Order(3)
     void playerNamesCannotBeNullOrBlank() {
         HumanPlayer human = new HumanPlayer('X', new Scanner(""));
         CpuPlayer cpu = new CpuPlayer('O', new Random(1));
@@ -47,7 +60,7 @@ class PlayerTest {
 
     /** Verifies a human can place a marker at valid coordinates. */
     @Test
-    @Order(3)
+    @Order(4)
     void humanCanPlaceAMoveFromSelectedCoordinates() {
         Board board = new Board();
         HumanPlayer player = new HumanPlayer('X', new Scanner(""));
@@ -60,7 +73,7 @@ class PlayerTest {
 
     /** Verifies the human player retries malformed and occupied coordinates. */
     @Test
-    @Order(4)
+    @Order(5)
     void humanRetriesMalformedAndOccupiedPositions() {
         Board board = new Board();
         board.place(0, 0, 'O');
@@ -79,7 +92,7 @@ class PlayerTest {
 
     /** Verifies the CPU chooses an empty cell and rejects a full board. */
     @Test
-    @Order(5)
+    @Order(6)
     void cpuSelectsAnEmptyCellAndCannotPlayOnAFullBoard() {
         Board board = new Board();
         board.place(0, 0, 'X');
@@ -100,7 +113,7 @@ class PlayerTest {
 
     /** Verifies successive human and CPU instances receive distinct defaults. */
     @Test
-    @Order(6)
+    @Order(7)
     void multiplePlayersReceiveSequentialDefaultNames() {
         HumanPlayer firstHuman = new HumanPlayer('X', new Scanner(""));
         HumanPlayer secondHuman = new HumanPlayer('O', new Scanner(""));

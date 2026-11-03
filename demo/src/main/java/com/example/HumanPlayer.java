@@ -21,8 +21,14 @@ public class HumanPlayer extends Player {
      * @throws IllegalArgumentException if {@code marker} is not {@code X} or {@code O}
      */
     public HumanPlayer(char marker, Scanner scanner) {
-        super(marker, "Player #" + PLAYER_COUNT.incrementAndGet());
-        this.scanner = Objects.requireNonNull(scanner, "scanner");
+        super(marker, nextDefaultName(marker, scanner));
+        this.scanner = scanner;
+    }
+
+    private static String nextDefaultName(char marker, Scanner scanner) {
+        validateMarker(marker);
+        Objects.requireNonNull(scanner, "scanner");
+        return "Player #" + PLAYER_COUNT.incrementAndGet();
     }
 
     /** Prompts for coordinates until this player's marker is placed successfully. */

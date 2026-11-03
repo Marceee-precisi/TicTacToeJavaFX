@@ -38,8 +38,14 @@ public class CpuPlayer extends Player {
      * @throws IllegalArgumentException if {@code marker} is not {@code X} or {@code O}
      */     
     public CpuPlayer(char marker, Random random) {
-        super(marker, "CPU #" + PLAYER_COUNT.incrementAndGet());
-        this.random = Objects.requireNonNull(random, "random");
+        super(marker, nextDefaultName(marker, random));
+        this.random = random;
+    }
+
+    private static String nextDefaultName(char marker, Random random) {
+        validateMarker(marker);
+        Objects.requireNonNull(random, "random");
+        return "CPU #" + PLAYER_COUNT.incrementAndGet();
     }
     
 

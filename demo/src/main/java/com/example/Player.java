@@ -26,11 +26,16 @@ public abstract class Player {
      * @throws IllegalArgumentException if the marker is not {@code X} or {@code O}
      */
     protected Player(char marker, String defaultName) {
+        validateMarker(marker);
+        this.marker = marker;
+        setName(defaultName);
+    }
+
+    /** Validates a player marker before a subclass initializes its own state. */
+    protected static void validateMarker(char marker) {
         if (marker != 'X' && marker != 'O') {
             throw new IllegalArgumentException("A player marker must be X or O");
         }
-        this.marker = marker;
-        setName(defaultName);
     }
 
     /**
