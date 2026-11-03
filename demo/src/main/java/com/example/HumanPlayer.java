@@ -2,12 +2,14 @@ package com.example;
 
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 
  * /** A player who chooses moves by entering coordinates in the console. 
  */
 public class HumanPlayer extends Player {
+    private static final AtomicInteger PLAYER_COUNT = new AtomicInteger();
     private final Scanner scanner;
 
     /**
@@ -19,7 +21,7 @@ public class HumanPlayer extends Player {
      * @throws IllegalArgumentException if {@code marker} is not {@code X} or {@code O}
      */
     public HumanPlayer(char marker, Scanner scanner) {
-        super(marker);
+        super(marker, "Player #" + PLAYER_COUNT.incrementAndGet());
         this.scanner = Objects.requireNonNull(scanner, "scanner");
     }
 
