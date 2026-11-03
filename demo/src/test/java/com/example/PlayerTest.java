@@ -7,12 +7,60 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.Scanner;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /** Unit tests for human and CPU player move behavior. */
+@TestMethodOrder(OrderAnnotation.class)
 class PlayerTest {
+    /** Verifies default names and that custom names can be read after setting. */
+    @Test
+    @Order(1)
+    void playersHaveDefaultNamesAndCanBeRenamed() {
+        HumanPlayer human = new HumanPlayer('X', new Scanner(""));
+        CpuPlayer cpu = new CpuPlayer('O', new Random(1));
+
+        assertEquals("Player #1", human.getName());
+        assertEquals("CPU #1", cpu.getName());
+        human.setName("Alice");
+        cpu.setName("Computer");
+        assertEquals("Alice", human.getName());
+        assertEquals("Computer", cpu.getName());
+    }
+
+    /** Verifies failed construction does not consume a default-name number. */
+    @Test
+    @Order(2)
+    void invalidPlayerConstructionDoesNotConsumeDefaultName() {
+        assertThrows(NullPointerException.class, () -> new HumanPlayer('X', null));
+        assertThrows(IllegalArgumentException.class, () -> new HumanPlayer('Z', new Scanner("")));
+        assertThrows(NullPointerException.class, () -> new CpuPlayer('X', null));
+        assertThrows(IllegalArgumentException.class, () -> new CpuPlayer('Z', new Random(1)));
+
+        assertEquals("Player #2", new HumanPlayer('O', new Scanner("")).getName());
+        assertEquals("CPU #2", new CpuPlayer('O', new Random(2)).getName());
+    }
+
+    /** Verifies names reject null, empty, and whitespace-only values. */
+    @Test
+    @Order(3)
+    void playerNamesCannotBeNullOrBlank() {
+        HumanPlayer human = new HumanPlayer('X', new Scanner(""));
+        CpuPlayer cpu = new CpuPlayer('O', new Random(1));
+
+        assertThrows(IllegalArgumentException.class, () -> human.setName(null));
+        assertThrows(IllegalArgumentException.class, () -> human.setName(""));
+        assertThrows(IllegalArgumentException.class, () -> human.setName(" \t "));
+        assertThrows(IllegalArgumentException.class, () -> cpu.setName(null));
+        assertThrows(IllegalArgumentException.class, () -> cpu.setName(""));
+        assertThrows(IllegalArgumentException.class, () -> cpu.setName(" \t "));
+    }
+
     /** Verifies a human can place a marker at valid coordinates. */
     @Test
+    @Order(4)
     void humanCanPlaceAMoveFromSelectedCoordinates() {
         Board board = new Board();
         HumanPlayer player = new HumanPlayer('X', new Scanner(""));
@@ -25,6 +73,7 @@ class PlayerTest {
 
     /** Verifies the human player retries malformed and occupied coordinates. */
     @Test
+    @Order(5)
     void humanRetriesMalformedAndOccupiedPositions() {
         Board board = new Board();
         board.place(0, 0, 'O');
@@ -43,6 +92,7 @@ class PlayerTest {
 
     /** Verifies the CPU chooses an empty cell and rejects a full board. */
     @Test
+    @Order(6)
     void cpuSelectsAnEmptyCellAndCannotPlayOnAFullBoard() {
         Board board = new Board();
         board.place(0, 0, 'X');
@@ -61,6 +111,19 @@ class PlayerTest {
         assertThrows(IllegalStateException.class, () -> cpu.makeMove(board));
     }
 
+    /** Verifies successive human and CPU instances receive distinct defaults. */
+    @Test
+    @Order(7)
+    void multiplePlayersReceiveSequentialDefaultNames() {
+        HumanPlayer firstHuman = new HumanPlayer('X', new Scanner(""));
+        HumanPlayer secondHuman = new HumanPlayer('O', new Scanner(""));
+        CpuPlayer firstCpu = new CpuPlayer('X', new Random(1));
+        CpuPlayer secondCpu = new CpuPlayer('O', new Random(2));
+
+        assertSequentialNames("Player #", firstHuman.getName(), secondHuman.getName());
+        assertSequentialNames("CPU #", firstCpu.getName(), secondCpu.getName());
+    }
+
     /** Counts the occurrences of a marker on the supplied board. */
     private int countMarker(Board board, char marker) {
         int count = 0;
@@ -72,5 +135,12 @@ class PlayerTest {
             }
         }
         return count;
+    }
+
+    /** Verifies the second default name increments the first one's sequence. */
+    private void assertSequentialNames(String prefix, String first, String second) {
+        assertTrue(first.startsWith(prefix));
+        int firstNumber = Integer.parseInt(first.substring(prefix.length()));
+        assertEquals(prefix + (firstNumber + 1), second);
     }
 }
